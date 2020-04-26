@@ -1,0 +1,103 @@
+#include <graphics.h>
+#include<cstdlib>
+#include <conio.h>
+#include"Game.h"
+#include<iostream>
+using namespace std;
+int dir = 3;
+//分数
+TCHAR score[20] = "0";
+int num = 0;
+int main()
+{
+	IMAGE left, right, up, down, food, body;
+	loadimage(&left, "Left.jpg", 20, 20);
+	loadimage(&right, "Right.jpg", 20, 20);
+	loadimage(&up, "Up.png", 20, 20);
+	loadimage(&down, "Down.png", 20, 20);
+	loadimage(&food, "Food.jpg", 20, 20);
+	loadimage(&body, "Body.jpg", 20, 20);
+	
+	// 初始化图形窗口
+	Map map;
+	map.Init();
+	map.Draw();
+	initgraph(900, 600);
+	setbkcolor(WHITE);
+	cleardevice();
+	settextcolor(RED);
+	setlinecolor(BLUE);
+	setfillcolor(YELLOW);
+	setbkmode(YELLOW);
+	settextstyle(30, 0, _T("Consolas"));
+	fillrectangle(600, 0, 900, 600);
+	outtextxy(700, 300, "分数： ");
+	outtextxy(790, 300, score);
+	Snack snack;
+	snack.Init();
+	putimage(300, 300, &left);
+	for (int i = 2; i <= snack.getLen(); i++) {
+		putimage(snack.co[i].x, snack.co[i].y, &body);
+	}
+	Food fd;
+	fd.Setxy(snack);
+	Coor fdxy = fd.getxy();
+	putimage(fdxy.x, fdxy.y, &food);
+	while (1) {
+		if (snack.Collision())
+			break;
+		fdxy = fd.getxy();
+		if (snack.Eat(fdxy.x, fdxy.y)) {
+			num += 10;
+			int t = num;
+			int k = 0;
+			while (t) {
+				t /= 10;
+				k++;
+			}
+			t = num;
+			score[k--] = '\0';
+			while (k >= 0) {
+				score[k] = t % 10 + '0';
+				t /= 10;
+				k--;
+			}
+			snack.Expand();
+			fd.Setxy(snack);
+			goto re;
+		}
+		if (_kbhit()) {
+			dir = _getch();
+			dir = _getch();
+		}
+		switch (dir) {
+		case 72: dir = 1; break;
+		case 80: dir = 2; break;
+		case 75: dir = 3; break;
+		case 77: dir = 4; break;
+		}
+		snack.Run(dir);
+		re:
+		cleardevice();
+		fillrectangle(600, 0, 900, 600);
+		outtextxy(700, 300, "分数：");
+		outtextxy(800, 300, score);
+		putimage(fdxy.x, fdxy.y, &food);
+		if (dir == 1)
+			putimage(snack.co[1].x, snack.co[1].y, &up);
+		else if (dir == 2)
+			putimage(snack.co[1].x, snack.co[1].y, &down);
+		else if (dir == 3)
+			putimage(snack.co[1].x, snack.co[1].y, &left);
+		else 
+			putimage(snack.co[1].x, snack.co[1].y, &right);
+		for (int i = 2; i <= snack.getLen(); i++) {
+			putimage(snack.co[i].x, snack.co[i].y, &body);
+		}
+		if (snack.Collision())
+			break;
+	}
+	system("pause");
+}
+
+
