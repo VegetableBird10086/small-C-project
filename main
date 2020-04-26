@@ -1,0 +1,44 @@
+#include<iostream>
+#include<conio.h>
+#include"Game.h"
+using namespace std;
+// 分数
+int score = 0;
+int main()
+{
+	Map map;
+	map.Init();
+	map.Draw();
+	Snack snack;
+	snack.Init();
+	Food food;
+	food.Setxy(snack);
+	int dir = 1;
+	while (1) {
+		if (snack.Collision())
+			break;
+		Coor temp = food.getxy();
+		if (snack.Eat(temp.x, temp.y)) {
+			score += 10;
+			snack.Expand();
+			food.Setxy(snack);
+		}
+		if (_kbhit()) {
+			dir = _getch();
+			dir = _getch();
+		}
+		switch (dir){
+		case 72: dir = 1; break;
+		case 80: dir = 2; break;
+		case 75: dir = 3; break;
+		case 77: dir = 4; break;
+		}
+		snack.Run(dir);
+		if (snack.Collision())
+			break;
+	}
+	system("cls");
+	cout << "分数：" << score << endl;
+	system("pause");
+	return 0;
+}
